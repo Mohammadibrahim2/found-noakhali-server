@@ -83,23 +83,46 @@ router.get("/get-teamsinfo", async (req, res) => {
 // });
 
 // //getting photo:- Api is okay
-// router.get("/product-photo/:id", async (req, res) => {
+router.get("/team-photo/:id", async (req, res) => {
 
-//     try {
-//         const productPhoto = await Product.findById(req.params.id).select("photo")
-//         if (productPhoto.photo.data) {
-//             res.set('Content-Type', productPhoto.photo.contenttype)
-//             return res.status(201).send(productPhoto.photo.data)
-//         }
+    try {
+        const teamPhoto = await TeamIfno.findById(req.params.id).select("photo")
+        if (teamPhoto.photo.data) {
+            res.set('Content-Type',teamPhoto.photo.contenttype)
+            return res.status(201).send(teamPhoto.photo.data)
+        }
 
-//     }
-//     catch (error) {
-//         res.send({
-//             error: error,
-//             message: "there is an error"
-//         })
-//     }
-// });
+    }
+    catch (error) {
+        res.send({
+            error: error,
+            message: "there is an error"
+        })
+    }
+});
+
+//get single team info
+router.get("/get-singleteam/:id", async (req, res) => {
+    try {
+        const id = req.params.id
+        const teamInfo = await TeamIfno.findOne({ _id: id }).select("-photo")
+        res.status(200).send({
+            message: "single teaminfo feched",
+            success: true,
+            teamInfo 
+        })
+        if (!teamInfo ){
+           res.status(400).send({
+            message:"there is a problem"
+           })
+        }
+
+    }
+
+    catch (error) {
+        console.log(error)
+    }
+})
 // //search from db by key api is done:-
 // router.get("/search/:keyword", async (req, res) => {
 //     const{ keyword } = req.params
