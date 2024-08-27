@@ -1,75 +1,60 @@
 const mongoose = require('mongoose');
 
 const teamSchema = mongoose.Schema({
-    teamsName: {
-        type: String,
+    teamName: {
+        type:mongoose.ObjectId,
+        ref:"Category",
+        required:true
 
     },
-    teamsNumber: {
+   teamMobile:{
         type: Number
 
-    },
-    categoryTeamswork:[ {
-        type: String
-
-    }],
-    rescuedNumber: {
-        type: Number
-
-    },
-    rescueLocation: {
+   },
+    teamswork: {
         type: String
 
     },
-    needMoreRescue: {
-        type: Boolean
+    serviceNumber: {
+        type: Number
 
     },
-    presentLocationRescuePeople: {
+    categoryOfService: {
         type: String
 
     },
     refugeLocation: {
-        type: String,
-
-    },
-    foodDonatedArea: {
-        type: String,
-
-    },
-    needMoreFood: {
-        type: Boolean,
-
-    },
-
-    medicalHelpArea: {
-        type: String,
-
-    },
-    needMoreMedicalHelp: {
-        type: Boolean,
-
-    },
-
-
-    donatedFamilyNumber: {
-        type: Number
-    },
-
-    nextWork: [{
         type: String
-     
-    }],
 
-    howManyDaysfood:{
-    type:Number
     },
+    zilla: {
+        type: String
+
+    },
+    upozila: {
+        type: String,
+
+    },
+    wordNo: {
+        type: String,
+
+    },
+    neededHelp: {
+        type: String
+
+    },
+
+    
     createdAt:{
         type: Date, 
      
         default: Date.now
     },
-    nextTargetedArea: {
+    areaDetails: {
+        type: String
+     
+    },
+    description: {
         type: String
      
     },
@@ -78,7 +63,6 @@ const teamSchema = mongoose.Schema({
         contentType: String
 
     },
-
 
 
 })

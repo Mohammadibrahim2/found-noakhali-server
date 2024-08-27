@@ -14,6 +14,8 @@ dotenv.config()
 app.use(express.json())
 
 const teamInfoRouter=require("./routes/teamInforouter")
+const categoryRouter=require("./routes/teamcategoryrouter");
+const userRouter=require("./routes/userruter");
 //connection withe db:-
 
 const uri ="mongodb+srv://mohammadibrahim6454:spnVCMwDVTvJtzX4@cluster0.mccfu.mongodb.net/"
@@ -37,7 +39,10 @@ async function run(){
 // start charity-app:
 
 
-app.use("/team",teamInfoRouter)
+app.use("/team",teamInfoRouter);
+app.use("/category",categoryRouter);
+app.use("/user",userRouter);
+
 
 }
       finally{

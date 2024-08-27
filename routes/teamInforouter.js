@@ -6,12 +6,14 @@ const fs = require("fs");
 const formidableMiddleware = require('express-formidable');
 const { default: slugify } = require("slugify");
 const cors=require('cors')
-
+const categorySchema= require('../models/Category')
 const teamSchema = require("../models/TeamIfno");
 
-
+const { ObjectId } = require("mongodb");
 
 const TeamIfno = new mongoose.model("Team", teamSchema );
+
+const Category = new mongoose.model("Category", categorySchema);
 
 
 app.use(cors());
@@ -19,32 +21,11 @@ app.use(cors());
 //successfully done the create router:
 router.post("/create-teaminfo",formidableMiddleware(), async(req, res) => {
 
-    const { teamsName, teamsNumber,rescuedNumber,rescueLocation,needMoreRescue
-        ,presentLocationRescuePeople, refugeLocation,foodDonatedArea
-        , needMoreFood,medicalHelpArea,needMoreMedicalHelp,
-        donatedFamilyNumber,nextWork,nextTargetedArea,
-         howManyDaysfood, categoryTeamswork} = req.fields;
+    const { teamName,  teamMobile,  serviceNumber, categoryOfService,
+        refugeLocation, areaDetails,zilla,upozila,wordNo,neededHelp,description} = req.fields;
+        
     const { photo } = req.files;
-    // switch (true) {
-    //     case !name:
-    //         return res.status(500).send({ error: "name is requried" });
-    //     // case !category:
-    //     //     return res.status(500).send({ error: "category is requried" });
-    //     // case !featuredCategory:
-    //     //     return res.status(500).send({ error: "featuredCategory is requried" });
-    //     // case !description:
-    //     //     return res.status(500).send({ error: "description is requried" });
-    //     //  case !price:
-    //     //     return res.status(500).send({ error: "price is requried" });
-    //     //  case !brand:
-    //     //     return res.status(500).send({ error: "brand requried" });
-    //      case !quantity:
-    //         return res.status(500).send({ error: "quantity requried" });
-
-    //     case photo && photo.size > 2000000:
-    //         return res.status(500).send({ error: "photo is requried and should be lezz than 1mb" });
-
-    // } 
+   
     const teamInfo= new TeamIfno({ ...req.fields })
     if (photo) {
         teamInfo.photo.data = fs.readFileSync(photo.path)
@@ -67,12 +48,28 @@ message:"teamInfo is not created"
 
 //get data from db :-
 router.get("/get-teamsinfo", async (req, res) => {
-    const teamsinfo = await TeamIfno.find().select('-photo').sort("-createdAt")
+    const teamsinfo = await TeamIfno.find().populate("teamName").select('-photo').sort("-createdAt")
     const countteamsinfo=await TeamIfno.countDocuments({})
     
         res.send({teamsinfo,countteamsinfo})
   
 });
+router.get("/teambycat/:id", async (req, res) => {
+    try {
+       const id=req.params.id
+console.log(req.params.id)
+        const category = await Category.findOne({ _id:new  ObjectId(id) });
+
+        const teamsinfo = await TeamIfno.find({ teamName:category}).populate("teamName").select('-photo')
+
+        res.send({teamsinfo })
+
+    }
+
+    catch (error) {
+        console.log(error)
+    }
+})
 //....
 // router.get("/admin/get-product",checklogin,isAdmin,async (req, res) => {
 //     const products = await Product.find().populate("category", "name").select('-photo').sort("-createdAt")
@@ -123,24 +120,58 @@ router.get("/get-singleteam/:id", async (req, res) => {
         console.log(error)
     }
 })
-// //search from db by key api is done:-
-// router.get("/search/:keyword", async (req, res) => {
-//     const{ keyword } = req.params
+//search from db by key api is done:-
+router.get("/search/:keyword", async (req, res) => {
+    const{ keyword } = req.params
+console.log(keyword)
+    let data = await TeamIfno.find({
+        $or: [
+           
+             { description: { $regex: keyword, $options: "i" } },
+             { areaDetails: { $regex: keyword, $options: "i" } },
+             {  categoryOfService: { $regex: keyword, $options: "i" } }
+           
 
-//     let data = await Product.find({
-//         $or: [
-//             { name: { $regex: keyword, $options: "i" } },
-//              { description: { $regex: keyword, $options: "i" } }
-//         ]
-//     }).select("-photo")
+             
+             
+        ]
+    }).select("-photo").sort("-createdAt")
     
-//     res.status(201).send({
-//         success:true,
-//         data:data
-//     })
+    res.status(201).send({
+        success:true,
+       data
+    })
 
 
 
 
-// });
+});
+// router.get("/team-filter",async(req,res)=>{
+//     console.log("hfkjh")
+//    await  res.send("ok")
+// })
+// router.post("/team-filter/:id", async (req, res) => {
+//     console.log(req.params)
+//     console.log("uehfhf")
+//     res.send("ok")
+       
+    // try {
+
+      
+    //     console.log("uehfhf")
+    //     res.send("fjakhf")
+
+    //     const teamsData = await TeamIfno.find({ teamName:req.body.value}).populate("teamName")
+    //     // res.status(200).send({
+    //     //     success: true,
+    //     //     teamsData 
+    //     // })
+    // }
+    // catch (error) {
+    //     res.send({
+    //         message: "filtering error"
+    //     })
+    // }
+// })
+
 module.exports = router;
